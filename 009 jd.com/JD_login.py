@@ -11,7 +11,7 @@ Info
 import requests
 from bs4 import BeautifulSoup
 import time
-
+from toolkit import Toolkit
 try:
     input = raw_input
 except:
@@ -45,17 +45,28 @@ class JDlogin(object):
         '''获取登录相关参数'''
         try:
             page = self.session.get(self.login_url, headers = self.headers )
-            soup = BeautifulSoup(page.text)
+            #print page.text
+            soup = BeautifulSoup(page.text,'lxml')
             input_list = soup.select('.form input')
-
+            print "BB"
             data = {}
+            print input_list
             data['uuid'] = input_list[0]['value']
+            print "!!!!!!!!!!!!!!!!!!"
             data['eid'] = input_list[4]['value']
+            print "!!!!!!!!!!!!!!!!!!"
             data['fp'] = input_list[5]['value']
+            print "!!!!!!!!!!!!!!!!!!"
             data['_t'] = input_list[6]['value']
+            print "!!!!!!!!!!!!!!!!!!"
             rstr = input_list[7]['name']
-            data[rstr] = input_list[7]['value']
+            print rstr
+            print "!!!!!!!!!!!!!!!!!!"
+            data[rstr] = input_list[8]['value']
+            print "!!!!!!!!!!!!!!!!!!"
             acRequired = self.session.post(self.auth_url, data={'loginName':self.un}).text #返回({"verifycode":true})或({"verifycode":false})
+
+            print acRequired
 
             if 'true' in acRequired:
                 print ('need authcode, plz find it and fill in ')
@@ -86,7 +97,10 @@ class JDlogin(object):
             print (e)
 
 if __name__=="__main__":
-    username = input("plz enter username:")
-    password = input("plz enter password:")
+    #username = input("plz enter username:")
+    #password = input("plz enter password:")
+    username=Toolkit.getUserData('data.cfg')['jd_username']
+    password=Toolkit.getUserData('data.cfg')['jd_password']
+    print username,password
     JD = JDlogin(username,password)
     JD.login()
